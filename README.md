@@ -1,215 +1,184 @@
-# Guidance Title (required)
+# Guidance for Cloud Native Fast Turnaround Workflows
 
-The Guidance title should be consistent with the title established first in Alchemy.
+## Table of Contents
 
-**Example:** *Guidance for Product Substitutions on AWS*
+1. [Overview](#overview)
+2. [Prerequisites](#prerequisites)
+3. [Usage](#usage)
+4. [Next Steps](#next-steps)
+5. [License](#license)
 
-This title correlates exactly to the Guidance it’s linked to, including its corresponding sample code repository. 
+## Overview
 
+A Time Addressable Media Store (TAMS) is a method of storing small chunks of media in object storage and tracking via an API using the [TAMS specification](https://github.com/bbc/tams) published by BBC R&D.  This allows live video and audio feeds to be ingested using S3 storage and made available to other systems for media processing while the ingest is still underway. 
 
-## Table of Contents (required)
+This guidance provides a set of sample scripts to help people who are new to TAMS to learn the API.  This includes exploring key API call and uploading an initial set of content into the store.
 
-List the top-level sections of the README template, along with a hyperlink to the specific section.
+This guidance can be used in combination with the following other AWS code repositories:
+- [Open Source Implementation of the TAMS Specification](https://github.com/awslabs/time-addressable-media-store)
+- [TAMS Tools](https://github.com/aws-samples/time-addressable-media-store-tools)
 
-### Required
+## Prerequisites
 
-1. [Overview](#overview-required)
-    - [Cost](#cost)
-2. [Prerequisites](#prerequisites-required)
-    - [Operating System](#operating-system-required)
-3. [Deployment Steps](#deployment-steps-required)
-4. [Deployment Validation](#deployment-validation-required)
-5. [Running the Guidance](#running-the-guidance-required)
-6. [Next Steps](#next-steps-required)
-7. [Cleanup](#cleanup-required)
+1. Python
+2. Requests library
+3. A deployed TAMS store
+4. Credentials to read, write and delete content in the TAMS store
 
-***Optional***
+## Usage
 
-8. [FAQ, known issues, additional considerations, and limitations](#faq-known-issues-additional-considerations-and-limitations-optional)
-9. [Revisions](#revisions-optional)
-10. [Notices](#notices-optional)
-11. [Authors](#authors-optional)
+Within a TAMS store the sequence of calls to create the content is critical to ensure that the data links up to create the data model correctly.  The following diagram shows the sequence in which the call should be made.  The sample scripts will allow the user to create all the elements shown as well as list them back via the API.
 
-## Overview (required)
+![Image showing the sequence of events for creating content in TAMS](assets/tams_api_sequence.png)
 
-1. Provide a brief overview explaining the what, why, or how of your Guidance. You can answer any one of the following to help you write this:
+### Credentials File
 
-    - **Why did you build this Guidance?**
-    - **What problem does this Guidance solve?**
+The `credentials.py` file holds the authentication credentials to access TAMS.  This is referenced by all the scripts to prevent needing to authenticate each one separately.
 
-2. Include the architecture diagram image, as well as the steps explaining the high-level overview and flow of the architecture. 
-    - To add a screenshot, create an ‘assets/images’ folder in your repository and upload your screenshot to it. Then, using the relative file path, add it to your README. 
+Open the file and fill in the following fields:
+- `TOKEN_URL`
+- `CLIENT_ID`
+- `CLIENT_SECRET`
+- `TAMS_URL`
 
-### Cost ( required )
+Save and exit the file
 
-This section is for a high-level cost estimate. Think of a likely straightforward scenario with reasonable assumptions based on the problem the Guidance is trying to solve. Provide an in-depth cost breakdown table in this section below ( you should use AWS Pricing Calculator to generate cost breakdown ).
+### Get Service Endpoint
 
-Start this section with the following boilerplate text:
+Open the `get-service.py` file.  This will connect to the TAMS store and retrieve the `/service` end point to confirm the credentials are correct and you can connect to the store
 
-_You are responsible for the cost of the AWS services used while running this Guidance. As of <month> <year>, the cost for running this Guidance with the default settings in the <Default AWS Region (Most likely will be US East (N. Virginia)) > is approximately $<n.nn> per month for processing ( <nnnnn> records )._
+Using your IDE run the python file or at a command line in the correct folder run the following command:
 
-Replace this amount with the approximate cost for running your Guidance in the default Region. This estimate should be per month and for processing/serving resonable number of requests/entities.
+```bash
+python get-service.py
+```
 
-Suggest you keep this boilerplate text:
-_We recommend creating a [Budget](https://docs.aws.amazon.com/cost-management/latest/userguide/budgets-managing-costs.html) through [AWS Cost Explorer](https://aws.amazon.com/aws-cost-management/aws-cost-explorer/) to help manage costs. Prices are subject to change. For full details, refer to the pricing webpage for each AWS service used in this Guidance._
+If successful then this will return a JSON response with the details of the TAMS API running on the store.  If this does not work check your credentials and connection information
 
-### Sample Cost Table ( required )
+### List Sources
 
-**Note : Once you have created a sample cost table using AWS Pricing Calculator, copy the cost breakdown to below table and upload a PDF of the cost estimation on BuilderSpace. Do not add the link to the pricing calculator in the ReadMe.**
+Open the `list-sources.py` file.  This will list all the sources in the store.  Depending on the contents of the store this may be blank at this point or will show existing content of the store.  This can be run at any time to view the store.
 
-The following table provides a sample cost breakdown for deploying this Guidance with the default parameters in the US East (N. Virginia) Region for one month.
+To run either click the run within your IDE or at a command line in the correct folder run the following command:
 
-| AWS service  | Dimensions | Cost [USD] |
-| ----------- | ------------ | ------------ |
-| Amazon API Gateway | 1,000,000 REST API calls per month  | $ 3.50month |
-| Amazon Cognito | 1,000 active users per month without advanced security feature | $ 0.00 |
+```bash
+python list-sources.py
+```
 
-## Prerequisites (required)
+### List Flows
 
-### Operating System (required)
+Open the `list-flows.py` file.  This will list all the sources in the store.  Depending on the contents of the store this may be blank at this point or will show existing content of the store.  This can be run at any time to view the store.
 
-- Talk about the base Operating System (OS) and environment that can be used to run or deploy this Guidance, such as *Mac, Linux, or Windows*. Include all installable packages or modules required for the deployment. 
-- By default, assume Amazon Linux 2/Amazon Linux 2023 AMI as the base environment. All packages that are not available by default in AMI must be listed out.  Include the specific version number of the package or module.
+To run either click the run within your IDE or at a command line in the correct folder run the following command:
 
-**Example:**
-“These deployment instructions are optimized to best work on **<Amazon Linux 2 AMI>**.  Deployment in another OS may require additional steps.”
+```bash
+python list-flows.py
+```
 
-- Include install commands for packages, if applicable.
+### Put Video Flow
 
+To create new content start by opening the `put-video-flow.py` file.  This will create a video flow within the store, which in turn will automatically create the associated video source.  The script will automatically generate the required IDs.
 
-### Third-party tools (If applicable)
+On lines 12 and 13 replace the placeholder details for the flow source and label with suitable values.
 
-*List any installable third-party tools required for deployment.*
+To run either click the run within your IDE or at a command line in the correct folder run the following command:
 
+```bash
+python put-video-flow.py
+```
 
-### AWS account requirements (If applicable)
+If successful this will return the full JSON body of the newly created flow along with the flow ID.  Take a copy of this for later in the process.  If you loose it you can always run the `list-flows.py` to view all content in the store.
 
-*List out pre-requisites required on the AWS account if applicable, this includes enabling AWS regions, requiring ACM certificate.*
+Running the `list-sources.py` should show the newly created source within the source for the new video flow.
 
-**Example:** “This deployment requires you have public ACM certificate available in your AWS account”
+### Put Audio Flow
 
-**Example resources:**
-- ACM certificate 
-- DNS record
-- S3 bucket
-- VPC
-- IAM role with specific permissions
-- Enabling a Region or service etc.
+The second stage of creating new content is to create the audio flow.  Open the `put-audio-flow.py` file.  This will create a audio flow within the store, which in turn will automatically create the associated audio source.  The script will automatically generate the required IDs.
 
+On lines 12 and 13 replace the placeholder details for the flow source and label with suitable values.
 
-### aws cdk bootstrap (if sample code has aws-cdk)
+To run either click the run within your IDE or at a command line in the correct folder run the following command:
 
-<If using aws-cdk, include steps for account bootstrap for new cdk users.>
+```bash
+python put-audio-flow.py
+```
 
-**Example blurb:** “This Guidance uses aws-cdk. If you are using aws-cdk for first time, please perform the below bootstrapping....”
+If successful this will return the full JSON body of the newly created flow along with the flow ID.  Take a copy of this for later in the process.  If you loose it you can always run the `list-flows.py` to view all content in the store.
 
-### Service limits  (if applicable)
+### Put Multi-Flow
 
-<Talk about any critical service limits that affect the regular functioning of the Guidance. If the Guidance requires service limit increase, include the service name, limit name and link to the service quotas page.>
+To link the audio and video together a multi flow and associated source is required.  This needs to collect together the video and audio sources that have just been created.
 
-### Supported Regions (if applicable)
+Open the `put-multi-flow.py` script.  
 
-<If the Guidance is built for specific AWS Regions, or if the services used in the Guidance do not support all Regions, please specify the Region this Guidance is best suited for>
+Lines 8 and 9 need updating with the flow ID's that have been created in the last two steps.  If you have lost either of them then use the `list-flows.py` script to view the content of the store.
 
+On lines 19 and 20 replace the placeholder details for the flow source and label with suitable values.
 
-## Deployment Steps (required)
+To run either click the run within your IDE or at a command line in the correct folder run the following command:
 
-Deployment steps must be numbered, comprehensive, and usable to customers at any level of AWS expertise. The steps must include the precise commands to run, and describe the action it performs.
+```bash
+python put-audio-flow.py
+```
 
-* All steps must be numbered.
-* If the step requires manual actions from the AWS console, include a screenshot if possible.
-* The steps must start with the following command to clone the repo. ```git clone xxxxxxx```
-* If applicable, provide instructions to create the Python virtual environment, and installing the packages using ```requirement.txt```.
-* If applicable, provide instructions to capture the deployed resource ARN or ID using the CLI command (recommended), or console action.
+If successful this will return the full JSON body of the newly created flow along with the flow ID.
 
- 
-**Example:**
+Running either `list-sources.py` or `list-flows.py` you should see the new structures along with the appropriate collections linking the multi source or flow to the associated video and audio source or flow.
 
-1. Clone the repo using command ```git clone xxxxxxxxxx```
-2. cd to the repo folder ```cd <repo-name>```
-3. Install packages in requirements using command ```pip install requirement.txt```
-4. Edit content of **file-name** and replace **s3-bucket** with the bucket name in your account.
-5. Run this command to deploy the stack ```cdk deploy``` 
-6. Capture the domain name created by running this CLI command ```aws apigateway ............```
+### Upload Segments
 
+The sample scripts come supplied with a small amount of content which has been formatted to match the video and audio flows created.  These can be found in the `samples-scripts/segments` folder.
 
+Open the `upload-segments.py` script.
 
-## Deployment Validation  (required)
+Lines 8 and 9 need updating with the video and audio flow ID's created previously.  If you have lost either of them then use the `list-flows.py` script to view the content of the store.
 
-<Provide steps to validate a successful deployment, such as terminal output, verifying that the resource is created, status of the CloudFormation template, etc.>
+To run either click the run within your IDE or at a command line in the correct folder run the following command:
 
+```bash
+python upload-segments.py
+```
 
-**Examples:**
+This will loop through the video and then the audio segments in turn.  For each it will request a storage location from TAMS, upload the segment to the provided URL and register against the TAMS API.  For simplicity the script is hardcoded with a segment length and calculates the timerange based on the segment number.
 
-* Open CloudFormation console and verify the status of the template with the name starting with xxxxxx.
-* If deployment is successful, you should see an active database instance with the name starting with <xxxxx> in        the RDS console.
-*  Run the following CLI command to validate the deployment: ```aws cloudformation describe xxxxxxxxxxxxx```
+### List segments
 
+To view the uploaded segments via the TAMS API then open the `list-segments.py` script
 
+Replace line 7 with the flow ID of either the video or audio flow that you wish to view the segments for.
 
-## Running the Guidance (required)
+To run either click the run within your IDE or at a command line in the correct folder run the following command:
 
-<Provide instructions to run the Guidance with the sample data or input provided, and interpret the output received.> 
+```bash
+python list-segments.py
+```
 
-This section should include:
+This should return a list of segments, their object ID's, the timerange and available URLs to access the content.
 
-* Guidance inputs
-* Commands to run
-* Expected output (provide screenshot if possible)
-* Output description
+### Delete flows
 
+To clean up the content in TAMS open the delete-flow.py script.  Each of the flows - video, audio and multi - will need to be deleted separately.  The store will automatically house keep both the media segments and any sources with no flows.
 
+Replace line 7 with the flow ID of first flow to be deleted.
 
-## Next Steps (required)
+To run either click the run within your IDE or at a command line in the correct folder run the following command:
 
-Provide suggestions and recommendations about how customers can modify the parameters and the components of the Guidance to further enhance it according to their requirements.
+```bash
+python delete-flow.py
+```
 
+Replace the flow ID and run the script again for each of the remaining flows.
 
-## Cleanup (required)
+You can view the contents of the store using the `list-sources.py` or `list-flows.py` scripts to confirm the contents has been deleted.
 
-- Include detailed instructions, commands, and console actions to delete the deployed Guidance.
-- If the Guidance requires manual deletion of resources, such as the content of an S3 bucket, please specify.
+## Next Steps
 
+Further information information on TAMS can be found in the Implementation Guide.
 
+## License
 
-## FAQ, known issues, additional considerations, and limitations (optional)
+This library is licensed under the MIT-0 License. See the LICENSE file.
 
-
-**Known issues (optional)**
-
-<If there are common known issues, or errors that can occur during the Guidance deployment, describe the issue and resolution steps here>
-
-
-**Additional considerations (if applicable)**
-
-<Include considerations the customer must know while using the Guidance, such as anti-patterns, or billing considerations.>
-
-**Examples:**
-
-- “This Guidance creates a public AWS bucket required for the use-case.”
-- “This Guidance created an Amazon SageMaker notebook that is billed per hour irrespective of usage.”
-- “This Guidance creates unauthenticated public API endpoints.”
-
-
-Provide a link to the *GitHub issues page* for users to provide feedback.
-
-
-**Example:** *“For any feedback, questions, or suggestions, please use the issues tab under this repo.”*
-
-## Revisions (optional)
-
-Document all notable changes to this project.
-
-Consider formatting this section based on Keep a Changelog, and adhering to Semantic Versioning.
-
-## Notices (optional)
-
-Include a legal disclaimer
-
-**Example:**
-*Customers are responsible for making their own independent assessment of the information in this Guidance. This Guidance: (a) is for informational purposes only, (b) represents AWS current product offerings and practices, which are subject to change without notice, and (c) does not create any commitments or assurances from AWS and its affiliates, suppliers or licensors. AWS products or services are provided “as is” without warranties, representations, or conditions of any kind, whether express or implied. AWS responsibilities and liabilities to its customers are controlled by AWS agreements, and this Guidance is not part of, nor does it modify, any agreement between AWS and its customers.*
-
-
-## Authors (optional)
-
-Name of code contributors
+- [License](LICENSE) of the project.
+- [Code of Conduct](CODE_OF_CONDUCT.md) of the project.
+- [CONTRIBUTING](CONTRIBUTING.md) for more information.
