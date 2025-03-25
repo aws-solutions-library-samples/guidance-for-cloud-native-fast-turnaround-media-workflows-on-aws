@@ -5,8 +5,9 @@
 1. [Overview](#overview)
 2. [Prerequisites](#prerequisites)
 3. [Usage](#usage)
-4. [Next Steps](#next-steps)
-5. [License](#license)
+4. [Costs](#costs)
+5. [Next Steps](#next-steps)
+6. [License](#license)
 
 ## Overview
 
@@ -170,6 +171,25 @@ python delete-flow.py
 Replace the flow ID and run the script again for each of the remaining flows.
 
 You can view the contents of the store using the `list-sources.py` or `list-flows.py` scripts to confirm the contents has been deleted.
+
+## Costs
+
+The sample scripts provided in this repository are designed to be run on the local workstation and connect to a remote TAMS instance. This means there are no direct costs of running the scripts however there may be costs incurred for depending on where and how the instance of TAMS is running.
+
+The following cost table is an estimate of the store costs based on the AWS Open Source implementation of the TAMS API.  It is based on running in EU West 1 (Dublin) and storing the content for no more than 2 days on S3 Standard.
+
+| AWS service  | Dimensions | Cost [USD] |
+| ----------- | ------------ | ------------ |
+| Amazon S3 | 30 PUT requests to S3 Standard        | $0.0001 |
+| Amazon S3 | 120 GET requests to S3 Standard       | $0.000048 |
+| Amazon S3 | 60MB for 2 days in S3 Standard        | $0.000092 |
+| Amazon S3 | 180MB data transfer out to internet   | $0.0162 |
+| Amazon API Gateway | 120 requests                 | $0.0001332 |
+| AWS Lambda | 120 requests                         | $0.0002235 |
+| Amazon DynamoDB | 90 requests                     | $0.0000215 |
+| **TOTAL** | | **$0.0168182** |
+
+Please note: These costs are only for the direct processing costs in a TAMS instance and does not include long running costs of a running store (eg AWS Cognito or AWS Neptune)
 
 ## Next Steps
 
